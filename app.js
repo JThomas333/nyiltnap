@@ -43,6 +43,16 @@ app.get(URL + "/tantargyak", (req, res) => {
     const visitable = db.prepare(`SELECT targy FROM orak Where ferohely = ?`).all();
     res.status(200).json(visitable);
 });
+app.get(URL + "/tanar", (req, res) => {
+    const datum = req.query.datum.replace(/-/g, '.');
+    const tanarnev = req.query.tanar;
+    if (!datum || !tanarnev){
+        return res.status(400).json({ error: "Hiányzó 'datum' vagy 'tanar' "});
+    }
+    
+
+});
+
 
 
 
