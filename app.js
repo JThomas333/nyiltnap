@@ -15,9 +15,35 @@ app.get("/telepules", (req, res) => {
 });
 
 app.get("/tanora", (req, res) => {
-    const orak = db.prepare("SELECT datum, terem, orasorszam FROM tanorak where tantargy = angol").all(datum, terem, orasorszam);
+    const targy = req.query.targy;
+    if (!targy){
+        return res.status(400).json({ error: "Hiányzó 'targy' lekérdezési paraméter" });
+    }
+    const orak = db.prepare("SELECT datum, terem, orasorszam FROM tanorak where targy = ? ORDER BY datum, orasorszam").all(targy);
     res.status(200).json(orak);
 });
+
+app.get("/9-matematika-fizika", (req, res) => {
+    const csoport = req.query.csoport;
+    if (!csoport){
+        return res.status(400).json({ error: "Hiányzó 'csoport' lekérdezési paraméter" });
+    }
+    const matematikaFizikaOrak = db.prepare("SELECT csoport, targy, datum, FROM tanorak WHERE csoport = ? AND (targy = 'matematika' OR targy = 'fizika') ORDER BY targy").all(csoport);
+    res.status(200).json(matematikaFizikaOrak);
+});
+// településenként hány diák regisztrált?
+app.get("/telepulesfo", (req, res) => {
+    const telepules = db.prepare("SELECT telepules, COUNT(*) AS diak_szam FROM diakok GROUP BY telepules ORDER BY diak_szam DESC").all();
+    res.status(200).json(telepules);
+});
+
+app.get("/tantargyak", (req, res) => {
+    const visitable = db.prepare(`SELECT targy FROM orak Where ferohely = ?`).all();
+    res.status(200).json(visitable);
+});
+
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
-});
+}); 
